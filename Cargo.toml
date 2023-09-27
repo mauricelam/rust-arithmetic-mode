@@ -1,0 +1,14 @@
+[package]
+name = "arithmetic-mode"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+anyhow = "1.0.75"
+proc-macro-utils = "0.8.0"
+proc-macro2 = "1.0.67"
+quote = "1.0.33"
+syn = { version = "2.0.37", features = ["extra-traits"] }
