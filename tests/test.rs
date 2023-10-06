@@ -1,7 +1,8 @@
 #![no_std]
+#![cfg_attr(feature="saturating_int_impl", feature(saturating_int_impl))]
+#![allow(clippy::precedence)]
 
 use arithmetic_mode::{checked, panicking, saturating, wrapping};
-use paste::paste;
 
 #[test]
 fn test_panicking() {
@@ -73,27 +74,36 @@ fn test_checked_operator_precedence() {
     assert_eq!(Some(11), checked! { 1_u8 + 2_u8 * 3_u8 + 4_u8 });
 }
 
+#[cfg(feature="saturating_int_impl")]
+#[test]
+fn test_saturating_shift() {
+    // Looks like the implementation of shift is just wrapping_shl / shr
+    // https://doc.rust-lang.org/src/core/num/saturating.rs.html#146
+    assert_eq!(2, saturating! { 1_u8 << 9_usize });
+    assert_eq!(127, saturating! { 255_u8 >> 9_usize });
+}
+
 macro_rules! test_unchanging {
     ($ident:ident, $expr:expr) => {
-        paste! {
+        ::paste::paste! {
             #[test]
             fn [<test_unchanging_panicking_ $ident>]() {
-                assert_eq!(($expr), (panicking! { $expr }));
+                assert_eq!(($expr), ($crate::panicking! { $expr }));
             }
 
             #[test]
             fn [<test_unchanging_wrapped_ $ident>]() {
-                assert_eq!($expr, wrapping!{ $expr });
+                assert_eq!($expr, $crate::wrapping!{ $expr });
             }
 
             #[test]
             fn [<test_unchanging_saturating_ $ident>]() {
-                assert_eq!($expr, saturating!{ $expr });
+                assert_eq!($expr, $crate::saturating!{ $expr });
             }
 
             #[test]
             fn [<test_unchanging_checked_ $ident>]() {
-                assert_eq!(Some($expr), checked!{ $expr });
+                assert_eq!(Some($expr), $crate::checked!{ $expr });
             }
         }
     };
@@ -104,4 +114,4 @@ test_unchanging!(negate, -42);
 test_unchanging!(or, 1 | 2);
 test_unchanging!(and, -10 & 2);
 test_unchanging!(xor, 1 ^ 2);
-test_unchanging!(complex, (1 ^ 2) | (3_i32 + (-4_i32 * 5_i32)));
+test_unchanging!(complex, (1 ^ 2) | 3_i32 + -4_i32 * 5_i32);

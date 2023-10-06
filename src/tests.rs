@@ -132,8 +132,6 @@ fn test_bitshift_no_saturating() {
 #[cfg_attr(not(feature = "saturating_int_impl"), ignore)]
 fn test_bitshift_saturating() {
     assert_expansion!(saturating_impl! { 1 << 2 >> 3 }.unwrap(), {
-        (::core::num::Saturating((::core::num::Saturating(1) << ::core::num::Saturating(2)).0)
-            >> ::core::num::Saturating(3))
-        .0
+        (::core::num::Saturating((::core::num::Saturating(1) << (2)).0) >> (3)).0
     });
 }

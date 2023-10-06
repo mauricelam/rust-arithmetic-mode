@@ -117,7 +117,7 @@ fn saturating_impl(item: TokenStream) -> anyhow::Result<TokenStream> {
                         syn::BinOp::Shl(_) => {
                             #[cfg(feature = "saturating_int_impl")]
                             {
-                                quote! { (::core::num::Saturating(#new_left) #op ::core::num::Saturating(#new_right)).0 }
+                                quote! { (::core::num::Saturating(#new_left) #op (#new_right)).0 }
                             }
 
                             #[cfg(not(feature = "saturating_int_impl"))]
@@ -128,7 +128,7 @@ fn saturating_impl(item: TokenStream) -> anyhow::Result<TokenStream> {
                         syn::BinOp::Shr(_) => {
                             #[cfg(feature = "saturating_int_impl")]
                             {
-                                quote! { (::core::num::Saturating(#new_left) #op ::core::num::Saturating(#new_right)).0 }
+                                quote! { (::core::num::Saturating(#new_left) #op (#new_right)).0 }
                             }
 
                             #[cfg(not(feature = "saturating_int_impl"))]

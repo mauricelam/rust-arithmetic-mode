@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.cargo.features": [
+        "saturating_int_impl"
+    ]
+}
