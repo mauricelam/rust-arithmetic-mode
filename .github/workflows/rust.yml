@@ -21,7 +21,7 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - run: rustup install nightly
-    - run: cargo +nightly test --verbose --features saturating_int_impl
+    - run: cargo +nightly test --verbose
 
   build-windows:
 
@@ -34,4 +34,4 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - run: rustup install nightly
-    - run: cargo +nightly test --verbose --features saturating_int_impl
+    - run: cargo +nightly test --verbose

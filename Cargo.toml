@@ -8,7 +8,6 @@ proc-macro = true
 
 [features]
 default = []
-saturating_int_impl = [] # Requires nightly and the lang-feature of the same name
 
 [dependencies]
 anyhow = "1.0.75"

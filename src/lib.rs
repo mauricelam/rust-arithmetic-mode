@@ -19,10 +19,8 @@
 //! * Sub `-`
 //! * Mul `*`
 //! * Div `/`
-//! * Shl `<<` (except `saturating`, which is only supported with the feature
-//!   `saturating_int_impl`, and requires nightly)
-//! * Shr `>>` (except `saturating`, which is only supported with the feature
-//!   `saturating_int_impl`, and requires nightly)
+//! * Shl `<<` (except `saturating`, due to https://github.com/rust-lang/libs-team/issues/230)
+//! * Shr `>>` (except `saturating`, due to https://github.com/rust-lang/libs-team/issues/230)
 //!
 //! ## Known issues
 //! * For most operations, constraining the numeric literals are required (e.g.
@@ -175,26 +173,10 @@ fn saturating_impl(item: TokenStream) -> anyhow::Result<TokenStream> {
                     syn::BinOp::Div(_) => quote! { (#new_left).saturating_div(#new_right) },
                     syn::BinOp::Rem(_) => quote! { (#new_left).saturating_rem(#new_right) },
                     syn::BinOp::Shl(_) => {
-                        #[cfg(feature = "saturating_int_impl")]
-                        {
-                            quote! { (::core::num::Saturating(#new_left) #op (#new_right)).0 }
-                        }
-
-                        #[cfg(not(feature = "saturating_int_impl"))]
-                        {
-                            bail!("Saturating bit shifts are not supported (https://github.com/rust-lang/libs-team/issues/230)")
-                        }
+                        bail!("Saturating bit shifts are not supported (https://github.com/rust-lang/libs-team/issues/230)")
                     }
                     syn::BinOp::Shr(_) => {
-                        #[cfg(feature = "saturating_int_impl")]
-                        {
-                            quote! { (::core::num::Saturating(#new_left) #op (#new_right)).0 }
-                        }
-
-                        #[cfg(not(feature = "saturating_int_impl"))]
-                        {
-                            bail!("Saturating bit shifts are not supported (https://github.com/rust-lang/libs-team/issues/230)")
-                        }
+                        bail!("Saturating bit shifts are not supported (https://github.com/rust-lang/libs-team/issues/230)")
                     }
                     syn::BinOp::And(_)
                     | syn::BinOp::Or(_)

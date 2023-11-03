@@ -17,10 +17,8 @@ wrapping! { 1_i32 + 2_i32 - 3_i32 };
 * Sub `-`
 * Mul `*`
 * Div `/`
-* Shl `<<` (except `saturating`, which is only supported with the feature
-  `saturating_int_impl`, and requires nightly)
-* Shr `>>` (except `saturating`, which is only supported with the feature
-  `saturating_int_impl`, and requires nightly)
+* Shl `<<` (except `saturating`, due to https://github.com/rust-lang/libs-team/issues/230)
+* Shr `>>` (except `saturating`, due to https://github.com/rust-lang/libs-team/issues/230)
 ## Known issues
 * For most operations, constraining the numeric literals are required (e.g.
   `2_i32` instead of `2`), due to

@@ -122,16 +122,7 @@ fn test_bitshift() {
     });
 }
 
-#[cfg_attr(feature = "saturating_int_impl", ignore)]
 #[test]
 fn test_bitshift_no_saturating() {
     saturating_impl(quote! { 1 << 2 >> 3 }).unwrap_err();
-}
-
-#[test]
-#[cfg_attr(not(feature = "saturating_int_impl"), ignore)]
-fn test_bitshift_saturating() {
-    assert_expansion!(saturating_impl! { 1 << 2 >> 3 }.unwrap(), {
-        (::core::num::Saturating((::core::num::Saturating(1) << (2)).0) >> (3)).0
-    });
 }

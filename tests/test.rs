@@ -1,5 +1,4 @@
 #![no_std]
-#![cfg_attr(feature="saturating_int_impl", feature(saturating_int_impl))]
 #![allow(clippy::precedence)]
 
 use arithmetic_mode::{checked, panicking, saturating, wrapping};
@@ -72,15 +71,6 @@ fn test_checked_add_overflow() {
 #[test]
 fn test_checked_operator_precedence() {
     assert_eq!(Some(11), checked! { 1_u8 + 2_u8 * 3_u8 + 4_u8 });
-}
-
-#[cfg(feature="saturating_int_impl")]
-#[test]
-fn test_saturating_shift() {
-    // Looks like the implementation of shift is just wrapping_shl / shr
-    // https://doc.rust-lang.org/src/core/num/saturating.rs.html#146
-    assert_eq!(2, saturating! { 1_u8 << 9_usize });
-    assert_eq!(127, saturating! { 255_u8 >> 9_usize });
 }
 
 macro_rules! test_unchanging {
