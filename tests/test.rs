@@ -1,0 +1,117 @@
+#![no_std]
+#![cfg_attr(feature="saturating_int_impl", feature(saturating_int_impl))]
+#![allow(clippy::precedence)]
+
+use arithmetic_mode::{checked, panicking, saturating, wrapping};
+
+#[test]
+fn test_panicking() {
+    assert_eq!(15, panicking! { 5_u8 + 10_u8 });
+    assert_eq!(11, panicking! { 1_u8 + 2_u8 * 3_u8 + 4_u8 });
+}
+
+#[test]
+#[should_panic]
+fn test_u8_add_u8() {
+    panicking! { 5_u8+255_u8 };
+}
+
+#[test]
+#[should_panic]
+fn test_u8_add_u8_2() {
+    panicking! { 200_u8+30_u8+30_u8 };
+}
+
+#[test]
+fn test_wrapping() {
+    assert_eq!(15, wrapping! { 5_u8 + 10_u8 });
+    assert_eq!(11, wrapping! { 1_u8 + 2_u8 * 3_u8 + 4_u8 });
+    assert_eq!(1, wrapping! { -1_i8 + 2 });
+    assert_eq!(-128, wrapping! { -1i8 << 7 });
+    assert_eq!(-1, wrapping! { -1i8 << 128 });
+    assert_eq!(-1, wrapping! { -128_i8 >> 7 });
+    assert_eq!(-128, wrapping! { -128_i16 >> 64 });
+}
+
+#[test]
+fn test_wrapping_add_overflow() {
+    assert_eq!(4, wrapping! { 5_u8 + 255_u8 });
+    assert_eq!(4, wrapping! { 200_u8 + 30_u8 + 30_u8 });
+    assert_eq!(u32::MAX, wrapping! { 0_u32 - 1 });
+}
+
+#[test]
+fn test_saturating_add() {
+    assert_eq!(15, saturating! { 5_u8 + 10_u8 });
+}
+
+#[test]
+fn test_saturating_add_overflow() {
+    assert_eq!(255, saturating! { 5_u8 + 255_u8 });
+    assert_eq!(255, saturating! { 200_u8 + 30_u8 + 30_u8 });
+    assert_eq!(0, saturating! { 0_u32 - 1 });
+}
+
+#[test]
+fn test_saturating_operator_precedence() {
+    assert_eq!(11, saturating! { 1_u8 + 2_u8 * 3_u8 + 4_u8 });
+}
+
+#[test]
+fn test_checked_add() {
+    assert_eq!(Some(15), checked! { 5_u8 + 10_u8 });
+}
+
+#[test]
+fn test_checked_add_overflow() {
+    assert_eq!(None, checked! { 5_u8 + 255_u8 });
+    assert_eq!(None, checked! { 200_u8 + 30_u8 + 30_u8 });
+    assert_eq!(None, checked! { 0_u32 - 1 });
+}
+
+#[test]
+fn test_checked_operator_precedence() {
+    assert_eq!(Some(11), checked! { 1_u8 + 2_u8 * 3_u8 + 4_u8 });
+}
+
+#[cfg(feature="saturating_int_impl")]
+#[test]
+fn test_saturating_shift() {
+    // Looks like the implementation of shift is just wrapping_shl / shr
+    // https://doc.rust-lang.org/src/core/num/saturating.rs.html#146
+    assert_eq!(2, saturating! { 1_u8 << 9_usize });
+    assert_eq!(127, saturating! { 255_u8 >> 9_usize });
+}
+
+macro_rules! test_unchanging {
+    ($ident:ident, $expr:expr) => {
+        ::paste::paste! {
+            #[test]
+            fn [<test_unchanging_panicking_ $ident>]() {
+                assert_eq!(($expr), ($crate::panicking! { $expr }));
+            }
+
+            #[test]
+            fn [<test_unchanging_wrapped_ $ident>]() {
+                assert_eq!($expr, $crate::wrapping!{ $expr });
+            }
+
+            #[test]
+            fn [<test_unchanging_saturating_ $ident>]() {
+                assert_eq!($expr, $crate::saturating!{ $expr });
+            }
+
+            #[test]
+            fn [<test_unchanging_checked_ $ident>]() {
+                assert_eq!(Some($expr), $crate::checked!{ $expr });
+            }
+        }
+    };
+}
+
+test_unchanging!(constant, 42);
+test_unchanging!(negate, -42);
+test_unchanging!(or, 1 | 2);
+test_unchanging!(and, -10 & 2);
+test_unchanging!(xor, 1 ^ 2);
+test_unchanging!(complex, (1 ^ 2) | 3_i32 + -4_i32 * 5_i32);

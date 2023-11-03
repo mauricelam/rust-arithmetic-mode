@@ -1,0 +1,19 @@
+[package]
+name = "arithmetic-mode"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[features]
+default = []
+saturating_int_impl = [] # Requires nightly and the lang-feature of the same name
+
+[dependencies]
+anyhow = "1.0.75"
+paste = "1.0.14"
+proc-macro-utils = "0.8.0"
+proc-macro2 = "1.0.67"
+quote = "1.0.33"
+syn = { version = "2.0.37", features = ["extra-traits"] }
